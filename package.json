@@ -1,5 +1,5 @@
 {
-	"name": "hlb.vscode",
+	"name": "hlb-vscode",
 	"displayName": "hlb",
 	"publisher": "openllb",
 	"description": "",
@@ -7,6 +7,10 @@
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.42.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/openllb/hlb.vscode"
 	},
 	"categories": [
 		"Other"
