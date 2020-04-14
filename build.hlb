@@ -45,6 +45,24 @@ fs publish() {
 	}
 }
 
+fs generateLock() {
+	npm
+	run "npm install" with option {
+		dir "/src"
+		mount fs {
+			local "." with option {
+				includePatterns "package.json"
+			}
+		} "/src" as lockOutput
+		mount fs { scratch; } "/src/node_modules"
+	}
+}
+
+fs lock() {
+	lockOutput
+	download "."
+}
+
 fs source() {
 	local "." with option {
 		includePatterns "LICENSE" "*.json" "src" "syntaxes"
