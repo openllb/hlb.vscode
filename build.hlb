@@ -1,0 +1,61 @@
+fs npm() {
+	image "alpine"
+	run "apk add --update npm"
+}
+
+fs vsce() {
+	npm
+	run "npm install -g vsce"
+}
+
+fs npmInstall() {
+	npm
+	run "npm install" with option {
+		dir "/src"
+		mount source "/src" with option {
+			readonly
+		}
+		mount fs { scratch; } "/src/node_modules" as nodeModules
+	}
+}
+
+fs packageBuilder() {
+	vsce
+	run "vsce package -o /package" with option {
+		dir "/src"
+		mount source "/src" with option {
+			readonly
+		}
+		mount nodeModules "/src/node_modules"
+		mount fs { scratch; } "/src/out"
+		mount fs { scratch; } "/package" as package
+	}
+}
+
+fs publish() {
+	vsce
+	run "vsce publish --packagePath /package/* -p $(cat /.token)" with option {
+		dir "/src"
+		mount source "/src" with option {
+			readonly
+		}
+		mount nodeModules "/src/node_modules"
+		mount package "/package"
+		secret ".token" "/.token"
+	}
+}
+
+fs source() {
+	local "." with option {
+		includePatterns "LICENSE" "*.json" "src" "syntaxes"
+	}
+	copy fs {
+		git "https://github.com/openllb/hlb.git" "master"
+	} "/language/hlb.tmLanguage" "/syntaxes/hlb.tmLanguage"
+	mkdir "node_modules" 0o755
+	mkdir "out" 0o755
+}
+
+fs default() {
+	publish
+}
