@@ -67,6 +67,7 @@ fs source() {
 	local "." with option {
 		includePatterns "LICENSE" "*.json" "src" "syntaxes"
 	}
+	mkdir "syntaxes" 0o755
 	copy fs {
 		git "https://github.com/openllb/hlb.git" "master"
 	} "/language/hlb.tmLanguage" "/syntaxes/hlb.tmLanguage"
