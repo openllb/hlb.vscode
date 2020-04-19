@@ -8,39 +8,39 @@ fs vsce() {
 	run "npm install -g vsce"
 }
 
-fs npmInstall() {
+fs npmInstall(fs src) {
 	npm
 	run "npm install" with option {
 		dir "/src"
-		mount source "/src" with option {
+		mount src "/src" with option {
 			readonly
 		}
-		mount fs { scratch; } "/src/node_modules" as nodeModules
+		mount scratch "/src/node_modules" as nodeModules
 	}
 }
 
-fs packageBuilder() {
+fs packageBuilder(fs src) {
 	vsce
 	run "vsce package -o /package" with option {
 		dir "/src"
-		mount source "/src" with option {
+		mount src "/src" with option {
 			readonly
 		}
-		mount nodeModules "/src/node_modules"
-		mount fs { scratch; } "/src/out"
-		mount fs { scratch; } "/package" as package
+		mount fs { nodeModules src; } "/src/node_modules"
+		mount scratch "/src/out"
+		mount scratch "/package" as package
 	}
 }
 
-fs publish() {
+fs publish(fs src) {
 	vsce
 	run "vsce publish --packagePath /package/* -p $(cat /.token)" with option {
 		dir "/src"
-		mount source "/src" with option {
+		mount src "/src" with option {
 			readonly
 		}
-		mount nodeModules "/src/node_modules"
-		mount package "/package"
+		mount fs { nodeModules src; } "/src/node_modules"
+		mount fs { package src; } "/package"
 		secret ".token" "/.token"
 	}
 }
@@ -54,27 +54,47 @@ fs generateLock() {
 				includePatterns "package.json"
 			}
 		} "/src" as lockOutput
-		mount fs { scratch; } "/src/node_modules"
+		mount scratch "/src/node_modules"
 	}
 }
 
-fs lock() {
-	lockOutput
-	download "."
-}
-
-fs source() {
-	local "." with option {
-		includePatterns "LICENSE" "*.json" "src" "syntaxes"
+fs source() {	
+	git "git@github.com:openllb/hlb.vscode.git" "master" with option {
+		keepGitDir
 	}
 	mkdir "syntaxes" 0o755
 	copy fs {
 		git "https://github.com/openllb/hlb.git" "master"
-	} "/language/hlb.tmLanguage" "/syntaxes/hlb.tmLanguage"
+	} "/language/hlb.tmLanguage" "syntaxes/."
 	mkdir "node_modules" 0o755
 	mkdir "out" 0o755
 }
 
+fs localSource() {
+	local "." with option {
+		includePatterns "LICENSE" "*.json" "src"
+	}
+	mkdir "syntaxes" 0o755
+	copy fs {
+		local "/Users/cbennett/gosrc/hlb/src/github.com/openllb/hlb/language" with option {
+			includePatterns "*.tmLanguage"
+		}
+	} "." "syntaxes/."
+	mkdir "node_modules" 0o755
+	mkdir "out" 0o755
+}
+
+fs updateLock() {
+	lockOutput
+	download "."
+}
+
+
+fs devPackage() {
+	package localSource
+	download "."
+}
+
 fs default() {
-	publish
+	publish source
 }
