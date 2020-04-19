@@ -59,7 +59,7 @@ fs generateLock() {
 }
 
 fs source() {	
-	git "git@github.com:openllb/hlb.vscode.git" "master" with option {
+	git "https://github.com/openllb/hlb.vscode.git" "master" with option {
 		keepGitDir
 	}
 	mkdir "syntaxes" 0o755
