@@ -98,3 +98,11 @@ fs devPackage() {
 fs default() {
 	publish source
 }
+
+string foo() {
+	value <<-EOM
+	THIS 
+		IS A
+	TEST
+	EOM
+}
