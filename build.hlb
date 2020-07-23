@@ -65,7 +65,7 @@ fs source() {
 	mkdir "syntaxes" 0o755
 	copy fs {
 		git "https://github.com/openllb/hlb.git" "master"
-	} "/language/hlb.tmLanguage" "syntaxes/."
+	} "/language/hlb.tmbundle/Syntaxes/hlb.tmLanguage" "syntaxes/."
 	mkdir "node_modules" 0o755
 	mkdir "out" 0o755
 }
@@ -76,7 +76,7 @@ fs localSource() {
 	}
 	mkdir "syntaxes" 0o755
 	copy fs {
-		local "/Users/cbennett/gosrc/hlb/src/github.com/openllb/hlb/language" with option {
+		local "/Users/cbennett/gosrc/hlb/src/github.com/openllb/hlb/language/hlb.tmbundle/Syntaxes" with option {
 			includePatterns "*.tmLanguage"
 		}
 	} "." "syntaxes/."
