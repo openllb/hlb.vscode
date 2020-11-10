@@ -45,15 +45,23 @@ fs publish(fs src) {
 	}
 }
 
-fs generateLock() {
+fs _bumpVersion() {
 	npm
-	run "npm install" with option {
+	run "npm version patch" with option {
 		dir "/src"
 		mount fs {
 			local "." with option {
 				includePatterns "package.json"
 			}
-		} "/src" as lockOutput
+		} "/src" as versionOutput
+	}
+}
+
+fs _generateLock(fs packageSource) {
+	npm
+	run "npm install" with option {
+		dir "/src"
+		mount packageSource "/src" as lockOutput
 		mount scratch "/src/node_modules"
 	}
 }
@@ -84,8 +92,14 @@ fs localSource() {
 	mkdir "out" 0o755
 }
 
+fs localPackage() {
+	local "." with option {
+		includePatterns "package.json"
+	}
+}
+
 fs updateLock() {
-	lockOutput
+	lockOutput localPackage
 	download "."
 }
 
@@ -97,4 +111,11 @@ fs devPackage() {
 
 fs default() {
 	publish source
+}
+
+# release is called to update local version and update dependencies.
+# after this is called, call default to publish release
+fs release() {
+	lockOutput versionOutput
+	download "."
 }
