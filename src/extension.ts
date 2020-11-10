@@ -4,12 +4,12 @@ import * as npmWhich from "npm-which";
 
 
 export function activate(context: vscode.ExtensionContext) {
-	const languageServerToolPath = npmWhich.sync("hlb-langserver", { cwd: context.extensionPath });
+	const languageServerToolPath = npmWhich.sync("hlb", { cwd: context.extensionPath });
 	let client = new langclient.LanguageClient(
 		languageServerToolPath,
 		{
 			command: languageServerToolPath,
-			args: [],
+			args: ["langserver"],
 			options: {}
 		},
 		{

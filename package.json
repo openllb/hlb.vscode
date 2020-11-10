@@ -4,7 +4,7 @@
 	"publisher": "openllb",
 	"description": "",
 	"preview": true,
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"engines": {
 		"vscode": "^1.42.0"
 	},
